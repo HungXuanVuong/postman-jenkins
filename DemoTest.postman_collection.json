@@ -1,0 +1,199 @@
+{
+	"id": "cbdbb8c0-dcc5-4c3b-b302-002af1973162",
+	"name": "DemoTest",
+	"description": "",
+	"auth": null,
+	"events": null,
+	"variables": [],
+	"order": [
+		"145bf950-5073-485e-a4db-c9a33c6f4a3a",
+		"dbe8e395-2ee3-42ad-8c7a-346fa693b8c2"
+	],
+	"folders_order": [],
+	"folders": [],
+	"requests": [
+		{
+			"id": "145bf950-5073-485e-a4db-c9a33c6f4a3a",
+			"name": "GET weather by random CITYID",
+			"url": "http://api.openweathermap.org/data/2.5/weather?id={{CITYID}}&appid={{APPID}}",
+			"description": "",
+			"data": null,
+			"dataMode": "params",
+			"headerData": [],
+			"method": "GET",
+			"pathVariableData": [],
+			"queryParams": [
+				{
+					"key": "id",
+					"value": "{{CITYID}}",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "appid",
+					"value": "{{APPID}}",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				}
+			],
+			"auth": null,
+			"events": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "2bf49664-d097-45bb-9de8-d2ef991f6c61",
+						"type": "text/javascript",
+						"exec": [
+							"var cityIds = [",
+							"    5206379, // Pittsburgh",
+							"    4440906, // Philadelphia",
+							"    4505716, // Baltimore",
+							"    4160812, // Key West",
+							"    3882428, // Lost Angeles",
+							"    5128638, // New York",
+							"    5809844, // Seattle",
+							"    1723862, // Boston",
+							"    4887398, // Chicago",
+							"    5506956, // Last Vegas",
+							"];",
+							"// Get a random number between 0-9",
+							"var randomCityId = Math.floor((Math.random() * 9) + 1);",
+							"",
+							"// Set an environment variable to the value of the random city id from array",
+							"postman.setEnvironmentVariable(\"CITYID\", cityIds[randomCityId])"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "2dfacdbd-ddaf-4c0b-b0e8-f2d1664cf117",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"//Saving the response \"name\" value into an environment variable",
+							"postman.setEnvironmentVariable(\"CITYNAME\", jsonData.name);",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"        "
+						]
+					}
+				}
+			],
+			"folder": null,
+			"headers": "",
+			"pathVariables": {}
+		},
+		{
+			"id": "dbe8e395-2ee3-42ad-8c7a-346fa693b8c2",
+			"name": "GET weather by CITYNAME",
+			"url": "http://api.openweathermap.org/data/2.5/weather?q={{CITYNAME}},us&appid={{APPID}}",
+			"description": "",
+			"data": null,
+			"dataMode": "params",
+			"headerData": [],
+			"method": "GET",
+			"pathVariableData": [],
+			"queryParams": [
+				{
+					"key": "q",
+					"value": "{{CITYNAME}},us",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "appid",
+					"value": "{{APPID}}",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				}
+			],
+			"auth": null,
+			"events": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0b8324ff-7e92-452b-a905-2467005cc0ec",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.test(\"City Name matches Request'\", function () {",
+							"    var contains = false;",
+							"    var cityFromResponse = postman.getEnvironmentVariable(\"CITYNAME\");",
+							"    //console.log(cityFromResponse);",
+							"    ",
+							"    if(jsonData.name == cityFromResponse) {",
+							"        contains = true;",
+							"    }",
+							"    else",
+							"    {",
+							"        console.log(\"Unexpected city\");",
+							"    }",
+							"    ",
+							"    pm.expect(contains).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Contains object: 'weather'\", function () {",
+							"    var contains = false;",
+							"    for (var key in jsonData) {",
+							"       if (key == \"weather\") {",
+							"           contains = true;",
+							"       }",
+							"    }",
+							"    pm.expect(contains).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Contains string: 'rain' \", function () {",
+							"    var contains = false;",
+							"    var expected = \"rain\";",
+							"    pm.expect(pm.response.text()).to.include(expected);",
+							"});",
+							"",
+							"pm.test(\"DOES NOT Contain string: 'snow' \", function () {",
+							"    var contains = false;",
+							"    var expected = \"snow\";",
+							"    pm.expect(pm.response.text()).to.not.include(expected);",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "22d4702b-c529-45db-8221-e13a5a400926",
+						"type": "text/javascript",
+						"exec": [
+							"// var cityNames = [",
+							"//     \"Pittsburgh\",",
+							"//     \"Philadelphia\",",
+							"//     \"Baltimore\",",
+							"//     \"Key West\",",
+							"//     \"Lost Angeles\",",
+							"//     \"New York\",",
+							"//     \"Seattle\",",
+							"//     \"Boston\",",
+							"//     \"Chicago\",",
+							"//     \"Last Vegas\"",
+							"// ];",
+							"// // Get a random number between 0-9",
+							"// var randomCityId = Math.floor((Math.random() * 9) + 1);",
+							"",
+							"// // Set an environment variable to the value of the random city id from array",
+							"// postman.setEnvironmentVariable(\"CITYNAME\", cityNames[randomCityId])"
+						]
+					}
+				}
+			],
+			"folder": null,
+			"headers": "",
+			"pathVariables": {}
+		}
+	]
+}
